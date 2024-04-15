@@ -46,21 +46,21 @@ const init = () => {
   build();
 }
 
-const build = () => {
-  // Dynamically generate entry points based on files in the 'components' directory
+const handleError = (err, stats) => {
+  if (err) {
+    console.error('An error occurred:', err);
+    return;
+  }
+  console.log(stats.toString({
+    colors: true,
+    modules: false,
+    children: false,
+  }));
+  console.log('Rebuild complete.');
+}
+
+const build = (watch = false) => {
   const componentsPath = path.join(process.cwd(), 'components');
-  console.log(componentsPath);
-  // const entry = {};
-
-  // fs.readdirSync(componentsPath).forEach(file => {
-  //   const fullPath = path.join(componentsPath, file);
-  //   const componentName = path.basename(file, path.extname(file));
-
-  //   // Assuming all components are .tsx files
-  //   if (path.extname(file) === '.tsx') {
-  //     entry[componentName] = fullPath;
-  //   }
-  // });
 
   // Specify the output bundle
   baseConfig.entry = path.join(__dirname, 'index.js');
@@ -69,21 +69,23 @@ const build = () => {
     'user-components': componentsPath
   };
 
-  // Execute Webpack build
-  webpack(baseConfig, (err, stats) => {
-    if (err) {
-      console.error('An error occurred:', err);
-      return;
-    }
+  if (watch) {
+    const watchConfig = {
+      ...baseConfig,
+      watch: true, // Enable watch mode
+      watchOptions: {
+        ignored: /node_modules/,  // You can specify paths to ignore here
+        aggregateTimeout: 100,    // Delay rebuild after the first change (in ms)
+        poll: 250                // Check for changes every quarter second
+      }
+    };
 
-    console.log(stats.toString({
-      colors: true, // Adds colors to the console output
-      modules: false, // Reduce verbosity by hiding modules list
-      children: false, // If using multiple configurations, show info for all configs
-    }));
-
-    console.log('Build complete. Bundle.js is ready in the /dist folder.');
-  });
+    const compiler = webpack(watchConfig);
+    compiler.watch(watchConfig.watchOptions, handleError);
+  } else {
+    webpack(baseConfig, handleError);
+  };
+  console.log('Build complete. Bundle.js is ready in the /dist folder.');
 };
 
 yargs(hideBin(process.argv))
@@ -91,5 +93,6 @@ yargs(hideBin(process.argv))
   .usage('$0 <cmd> [args]')
   .command('init', 'Initialize a new widget project', init)
   .command('build', 'Build your widget project', build)
+  .command('watch', 'Watch for changes and rebuild', ()=>build(true))
   .help()
   .argv;

@@ -1,16 +1,11 @@
-// import { html, useState, useEffect } from "../util/preactCentral.js";
 import React, { useEffect } from 'react';
-import '../styles/Alt Login.css';
+import '../styles/alt-login.css';
 
-const setUserData = (user) => {
-  console.log(user);
-}
-
-const PHCLogin = ({ userData }) => {
+const PHCLogin = ({ userData, setUserData, setError, approot }) => {
   const localStoragePrefix = "mpp-widgets";
 
   const phcGetAppRoot = () => {
-    return "https://my.pureheart.org/widgets";
+    return `${approot}/widgets`;
   };
 
   const phcGetAuthConfiguration = () => {
@@ -20,6 +15,7 @@ const PHCLogin = ({ userData }) => {
     return fetch(configURL).then(
       (configData) => configData.json(),
       () => {
+        setError("Unable to retrieve auth info.")
         throw console.error("Unable to retrieve auth info!");
       }
     );
@@ -32,6 +28,7 @@ const PHCLogin = ({ userData }) => {
     return fetch(tokenURL)
       .then((tokenData) => tokenData.json())
       .catch((error) => {
+        setError("Unable to retrieve auth token.")
         throw (
           (console.error("Unable to retrieve auth token!"),
           console.error(error))
@@ -46,6 +43,7 @@ const PHCLogin = ({ userData }) => {
     return fetch(CSRFTokenURL)
       .then((tokenData) => tokenData.json())
       .catch((error) => {
+        setError("Unable to retrieve auth token.")
         throw (
           (console.error("Unable to retrieve auth token!"),
           console.error(error))
@@ -70,6 +68,7 @@ const PHCLogin = ({ userData }) => {
         .then(phcSaveCSRFToken)
         .catch((error) => {
           throw (
+            setError("Unable to retrieve auth token.")
             (console.error("Unable to retrieve auth token!"),
             console.error(error))
           );
@@ -134,6 +133,7 @@ const PHCLogin = ({ userData }) => {
     return phcGetRequest(userURL)
       .then((userData) => userData)
       .catch((error) => {
+        setError("Unable to retrieve current user.")
         throw (
           (console.error("Unable to retrieve current user!"),
           console.error(error))
@@ -205,13 +205,16 @@ const PHCLogin = ({ userData }) => {
     getCurrentUser().then((userData) => {
       if (!userData || !Object.keys(userData).length) {
         setUserData({});
-        return;
       };
 
       setUserData(userData);
     });
 
   useEffect(() => {
+    if (!approot) {
+      setError('Missing Required Parameter: \'approot\'')
+    }
+
     const cacheKey = sessionStorage.getItem("cachedKey");
     if (cacheKey) {
       phcGetAuthToken(cacheKey).then((tokenData) => {
@@ -232,7 +235,7 @@ const PHCLogin = ({ userData }) => {
   
   return (
     <div className="phc-user-login-container">
-      {!userData || !Object.keys(userData).length
+      {userData && !Object.keys(userData).length
         ? <button className="phc-btn" id="phc-loginButton" onClick={phcSignIn}>Log In</button>
         : <button className="phc-btn" id="phc-logoutButton" onClick={phcSignOut}>Log Out</button>
       }
