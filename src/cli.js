@@ -60,13 +60,11 @@ const handleError = (err, stats) => {
 }
 
 const build = (watch = false) => {
-  const componentsPath = path.join(process.cwd(), 'components');
-
   // Specify the output bundle
   baseConfig.entry = path.join(__dirname, 'index.js');
   baseConfig.output.path = path.resolve(process.cwd(), 'dist');
   baseConfig.resolve.alias = {
-    'user-components': componentsPath
+    '@': path.resolve(process.cwd())
   };
 
   if (watch) {

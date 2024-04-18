@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "es6",
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "baseUrl": ".", // This should be the root of your source files
+    "paths": {
+      "@/*": [
+        "./*"
+      ] // Adjust this if necessary to correctly map to your src directory structure
+    },
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true // Since you are using Webpack for building, you might not want TypeScript to output files
+  },
+  "include": [
+    "./"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,6 +1,7 @@
 module.exports = {
-  mode: 'production',
-  entry: '',
+  // mode: 'production',
+  mode: 'development',
+  entry: './src/index.js',
   output: {
     filename: 'bundle.js'
   },
@@ -29,6 +30,9 @@ module.exports = {
     ],
   },
   resolve: {
+    alias: {
+      "@": "../"
+    },
     extensions: ['.js', '.jsx', '.ts', '.tsx']
   }
 };

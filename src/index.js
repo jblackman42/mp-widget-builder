@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { createRoot } from 'react-dom/client';
 import { MdErrorOutline } from "react-icons/md";
 
-const context = require.context('user-components', true, /\.(jsx|tsx)$/);
+const context = require.context('@/components', true, /\.(jsx|tsx)$/);
 class EventEmitter {
   constructor() {
     this.events = {};
@@ -68,8 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
           const root = createRoot(elem);
           root.render(React.createElement(AuthComponent, {Component, props}));
         });
-      } else {
-        console.error(`No default export found in ${filename}`);
       }
     } catch (error) {
       console.error(`Error processing ${filename}: ${error}`);
