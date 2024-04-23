@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { createRoot } from 'react-dom/client';
 import { MdErrorOutline } from "react-icons/md";
 
-const context = require.context('@/components', true, /\.(jsx|tsx)$/);
+const context = require.context('@/components', false, /\.(jsx|tsx)$/);
 const cssContext = require.context('@/styles', true, /\.(css)$/);
 
 class EventEmitter {

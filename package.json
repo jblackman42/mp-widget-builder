@@ -1,6 +1,6 @@
 {
   "name": "mp-widget-builder",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "",
   "main": "./src/index.tsx",
   "repository": "https://github.com/jblackman42/mp-widget-builder",
