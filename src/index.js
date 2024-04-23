@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { MdErrorOutline } from "react-icons/md";
 
 const context = require.context('@/components', true, /\.(jsx|tsx)$/);
+const cssContext = require.context('@/styles', true, /\.(css)$/);
+
 class EventEmitter {
   constructor() {
     this.events = {};
@@ -52,23 +54,36 @@ const AuthComponent = ({Component, props}) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-
   context.keys().forEach((filename) => {
     try {
       const Component = context(filename).default;
-      const elementName = filename.replace('./', '').replace(/\.\w+$/, '').toLowerCase();
-      if (Component) {
-        document.querySelectorAll(elementName).forEach(elem => {
+      const elementName = `${filename.replace('./', '').replace(/\.\w+$/, '').toLowerCase()}`;
+      class DynamicCustomElement extends HTMLElement {
+        constructor() {
+          super();
+          const shadowRoot = this.attachShadow({ mode: 'open' });
           const props = {};
 
-          Array.from(elem.attributes).forEach(attr => {
+          const componentStylesheet = cssContext.keys().find(cssFilename => cssFilename.replace('./', '').replace(/\.\w+$/, '').toLowerCase() === elementName);
+          if (componentStylesheet) {
+            const style = document.createElement('style');
+            style.textContent = cssContext(componentStylesheet).default;
+            shadowRoot.appendChild(style);
+          }
+          
+
+          // Transfer attributes to props
+          Array.from(this.attributes).forEach(attr => {
             const propName = attr.name.replace(/-(\w)/g, (match, letter) => letter.toUpperCase());
             props[propName] = attr.value;
           });
-          const root = createRoot(elem);
-          root.render(React.createElement(AuthComponent, {Component, props}));
-        });
+
+          const root = createRoot(shadowRoot);
+          root.render(React.createElement(AuthComponent, { Component, props }));
+        }
       }
+
+      customElements.define(elementName, DynamicCustomElement);
     } catch (error) {
       console.error(`Error processing ${filename}: ${error}`);
     }

@@ -66,8 +66,8 @@ const build = (watch = false) => {
   baseConfig.resolve.alias = {
     '@': path.resolve(process.cwd())
   };
-
-  if (watch) {
+  
+  if (watch === true) {
     const watchConfig = {
       ...baseConfig,
       watch: true, // Enable watch mode
@@ -78,12 +78,10 @@ const build = (watch = false) => {
       }
     };
 
-    const compiler = webpack(watchConfig);
-    compiler.watch(watchConfig.watchOptions, handleError);
+    webpack(watchConfig, handleError);
   } else {
     webpack(baseConfig, handleError);
   };
-  console.log('Build complete. Bundle.js is ready in the /dist folder.');
 };
 
 yargs(hideBin(process.argv))
